@@ -14,7 +14,10 @@
 #     version => '9.1',
 #   }
 #
-class postgresql::params ($version = $::postgres_default_version) {
+class postgresql::params (
+  $version = $::postgres_default_version,
+  $locale  = 'C',
+  ) {
   $user                         = 'postgres'
   $group                        = 'postgres'
   $ip_mask_deny_postgres_user   = '0.0.0.0/0'
