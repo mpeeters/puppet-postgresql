@@ -34,17 +34,10 @@
 define postgresql::db (
   $user,
   $password,
+  $owner       = 'postgres',
   $charset     = 'utf8',
   $grant       = 'ALL'
 ) {
-
-  postgresql::database { $name:
-    # TODO: ensure is not yet supported
-    #ensure     => present,
-    charset     => $charset,
-    #provider   => 'postgresql',
-    require     => Class['postgresql::server'],
-  }
 
   if ! defined(Postgresql::Database_user[$user]) {
     postgresql::database_user { $user:
@@ -56,12 +49,23 @@ define postgresql::db (
     }
   }
 
-  postgresql::database_grant { "GRANT ${user} - ${grant} - ${name}":
-    privilege       => $grant,
-    db              => $name,
-    role            => $user,
-    #provider       => 'postgresql',
-    require         => Postgresql::Database_user[$user],
+  postgresql::database { $name:
+    # TODO: ensure is not yet supported
+    #ensure     => present,
+    charset     => $charset,
+    owner       => $owner,
+    #provider   => 'postgresql',
+    require     => Class['postgresql::server'],
+  }
+
+  if $user != $owner {
+    postgresql::database_grant { "GRANT ${user} - ${grant} - ${name}":
+      privilege       => $grant,
+      db              => $name,
+      role            => $user,
+      #provider       => 'postgresql',
+      require         => Postgresql::Database_user[$user],
+    }
   }
 
 }

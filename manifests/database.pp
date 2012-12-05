@@ -21,7 +21,8 @@
 
 define postgresql::database(
   $dbname  = $title,
-  $charset = 'UTF8')
+  $charset = 'UTF8',
+  $owner   = 'postgres')
 {
   require postgresql::params
 
@@ -29,7 +30,7 @@ define postgresql::database(
     $locale_option = '--locale=C'
   }
 
-  $createdb_command = "${postgresql::params::createdb_path} --template=template0 --encoding '${charset}' ${locale_option} '${dbname}'"
+  $createdb_command = "${postgresql::params::createdb_path} --owner=${owner} --template=template0 --encoding '${charset}' ${locale_option} '${dbname}'"
 
   postgresql_psql { "Check for existence of db '$dbname'":
     command => "SELECT 1",

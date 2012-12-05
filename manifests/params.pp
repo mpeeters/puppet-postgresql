@@ -10,7 +10,11 @@
 #
 # Sample Usage:
 #
-class postgresql::params {
+#   class { 'postgresql::params':
+#     version => '9.1',
+#   }
+#
+class postgresql::params ($version = $::postgres_default_version) {
   $user                         = 'postgres'
   $group                        = 'postgres'
   $ip_mask_deny_postgres_user   = '0.0.0.0/0'
@@ -40,9 +44,9 @@ class postgresql::params {
   case $::osfamily {
     'RedHat': {
       $service_name             = 'postgresql'
-      $client_package_name      = 'postgresql'
-      $server_package_name      = 'postgresql-server'
-      $devel_package_name       = 'postgresql-devel'
+      $client_package_name      = "postgresql${version}"
+      $server_package_name      = "postgresql${version}-server"
+      $devel_package_name       = "postgresql${version}-devel"
       $needs_initdb             = true
       $initdb_path              = '/usr/bin/initdb'
       $createdb_path            = '/usr/bin/createdb'
@@ -63,22 +67,22 @@ class postgresql::params {
         'Ubuntu': {
             case $::lsbmajdistrelease {
                 # thanks, ubuntu
-                '10':       { $service_name = "postgresql-${::postgres_default_version}" }
+                '10':       { $service_name = "postgresql-${version}" }
                 default:    { $service_name = 'postgresql' }
             }
         }
       }
 
-      $client_package_name      = 'postgresql-client'
-      $server_package_name      = 'postgresql'
+      $client_package_name      = "postgresql-client-${version}"
+      $server_package_name      = "postgresql-${version}"
       $devel_package_name       = 'libpq-dev'
       $needs_initdb             = false
-      $initdb_path              = "/usr/lib/postgresql/${::postgres_default_version}/bin/initdb"
-      $createdb_path            = "/usr/lib/postgresql/${::postgres_default_version}/bin/createdb"
-      $psql_path                = "/usr/lib/postgresql/${::postgres_default_version}/bin/psql"
-      $datadir                  = "/var/lib/postgresql/${::postgres_default_version}/main"
-      $pg_hba_conf_path         = "/etc/postgresql/${::postgres_default_version}/main/pg_hba.conf"
-      $postgresql_conf_path     = "/etc/postgresql/${::postgres_default_version}/main/postgresql.conf"
+      $initdb_path              = "/usr/lib/postgresql/${version}/bin/initdb"
+      $createdb_path            = "/usr/lib/postgresql/${version}/bin/createdb"
+      $psql_path                = "/usr/lib/postgresql/${version}/bin/psql"
+      $datadir                  = "/var/lib/postgresql/${version}/main"
+      $pg_hba_conf_path         = "/etc/postgresql/${version}/main/pg_hba.conf"
+      $postgresql_conf_path     = "/etc/postgresql/${version}/main/postgresql.conf"
       $firewall_supported       = false
       $service_status           = "/etc/init.d/${service_name} status | /bin/egrep -q 'Running clusters: .+'"
       # TODO: not exactly sure yet what the right thing to do for Debian/Ubuntu is.
@@ -91,5 +95,6 @@ class postgresql::params {
       fail("Unsupported osfamily: ${::osfamily} operatingsystem: ${::operatingsystem}, module ${module_name} currently only supports osfamily RedHat and Debian")
     }
   }
+
 
 }

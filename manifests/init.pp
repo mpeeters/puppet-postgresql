@@ -13,7 +13,7 @@
 #
 class postgresql (
   $package_name   = $postgresql::params::client_package_name,
-  $package_ensure = 'present'
+  $package_ensure = 'present',
 ) inherits postgresql::params {
 
   package { 'postgresql_client':
